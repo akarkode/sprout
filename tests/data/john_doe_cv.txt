@@ -1,0 +1,34 @@
+John Doe
+Email: john.doe@example.com
+Phone: +1 234 567 890
+Location: San Francisco, CA, USA
+LinkedIn: linkedin.com/in/johndoe
+GitHub: github.com/johndoe
+
+PROFESSIONAL SUMMARY
+Data Engineer with 5+ years of experience in building and optimizing data pipelines,
+data warehouses, and ETL workflows. Skilled in Python, SQL, and cloud-based big data solutions.
+
+EDUCATION
+B.Sc. in Computer Science, University of California, Berkeley (2014 - 2018)
+
+TECHNICAL SKILLS
+• Python • SQL • Apache Spark • Airflow • AWS • Docker • Kubernetes • Data Warehousing
+
+PROFESSIONAL EXPERIENCE
+Data Engineer | TechCorp Inc. | Jan 2020 - Present
+- Designed and optimized ETL pipelines using Airflow and Spark.
+- Built data warehouse solutions on AWS Redshift.
+- Collaborated with data scientists to deliver real-time analytics.
+
+Junior Data Engineer | DataSolutions LLC | Jul 2018 - Dec 2019
+- Assisted in developing Python-based ETL pipelines.
+- Managed SQL databases and wrote complex queries.
+- Supported migration of on-premise systems to cloud-based infrastructure.
+
+PROJECTS
+Real-Time Analytics Platform
+- Developed a real-time data ingestion system using Kafka and Spark Streaming.
+
+Data Lakehouse Implementation
+- Led the migration of data warehouse to a lakehouse architecture using Delta Lake.
