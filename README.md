@@ -42,6 +42,7 @@ Its task is to:
 ---
 
 ## 📂 Project Structure (simplified)
+```
 sprout/
 │── app/
 │   ├── src/
@@ -55,7 +56,7 @@ sprout/
 │── tests/
 │   ├── data/                  # Test CVs (pdf, docx, txt)
 │   └── test_cv_parser.py      # Unit tests for CV parser route
-
+```
 ---
 
 ## ▶️ Running the Application
