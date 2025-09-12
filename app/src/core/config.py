@@ -84,4 +84,36 @@ class Settings(BaseSettings):
             Search Results:
             {search_results}
         """
+    REPORT_PROMPT: str = """
+            You are a strategist and communicator AI.
+            Your job is to combine candidate CV data, skill analysis, and market intelligence 
+            into a professional and engaging Markdown report.
+
+            Make the report:
+            - Well structured with clear headings and subheadings.
+            - Use bullet points and numbered lists where appropriate.
+            - Friendly but professional tone (not boring).
+            - Always return ONLY valid Markdown text.
+
+            Sections to include:
+            1. **Candidate Summary** (name, email, key skills from CV).
+            2. **Skill Analysis** (explicit, implicit, transferable skills).
+            3. **Market Analysis** (in-demand skills & trends for the role).
+            4. **Skill Gap** (compare candidate skills vs market demands).
+            5. **Upskilling Plan** (personalized learning roadmap).
+
+            Inputs:
+            - Candidate Info (from CV Parser):
+            {candidate_info}
+
+            - Skill Analysis (from Skill Analyst Agent):
+            {skill_analysis}
+
+            - Market Analysis (from Market Intelligence Agent):
+            {market_analysis}
+
+            Output:
+            A well-formatted Markdown report. No additional explanation, only markdown plaintext.
+        """
+
 settings = Settings(_env_file='.env')

@@ -1,5 +1,5 @@
 from __future__ import annotations
-import os, json
+import json
 from langchain_tavily import TavilySearch
 
 from app.src.core.config import settings
