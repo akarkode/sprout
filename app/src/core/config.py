@@ -5,6 +5,7 @@ from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
     OPENAI_KEY: str = ""
+    TAVILY_API_KEY: str = ""
     CV_PARSER_PROMPT: str = """
             You are an expert CV parser. 
             Extract the following fields from the text and return them in JSON format:
@@ -64,5 +65,23 @@ class Settings(BaseSettings):
 
             CV Data:
             {cv_data_json}
+        """
+    MARKETING_INTELEGENT_PROMPT: str = """
+            You are a market intelligence analyst.
+            Task: Analyze the search results about the role "{role}".
+            
+            Extract:
+            - A list of in-demand skills and technologies.
+            - A concise summary (3-5 sentences) of market expectations.
+
+            Always return ONLY valid JSON:
+            {{
+            "role": "{role}",
+            "in_demand_skills": [],
+            "summary": ""
+            }}
+            No additional explanation, no markdown, only the JSON object.
+            Search Results:
+            {search_results}
         """
 settings = Settings(_env_file='.env')

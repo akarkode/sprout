@@ -10,19 +10,18 @@ class AIBaseAgent:
     def __init__(self, model: str = "gpt-4o-mini"):
         self.llm = ChatOpenAI(model=model, api_key=settings.OPENAI_KEY)
 
-    def run(self, prompt_template: str, variable_key: str, variable_value: str) -> dict:
+    def run(self, prompt_template: str, variables: dict) -> dict:
         """
-        Run LLM with given prompt template and variable.
+        Run LLM with given prompt template and variables.
         - prompt_template: string template for ChatPromptTemplate
-        - variable_key: placeholder name in prompt (e.g., 'cv_text' or 'cv_data')
-        - variable_value: value to inject into the prompt
+        - variables: dict of key-value pairs to inject into the prompt
+          e.g., {"cv_text": "...", "role": "...", "search_results": "..."}
         """
         prompt = ChatPromptTemplate.from_template(prompt_template)
         chain = prompt | self.llm
-        response = chain.invoke({variable_key: variable_value})
+        response = chain.invoke(variables)
 
         try:
-            print(response.content)
             return json.loads(response.content)
         except Exception as e:
             return {"error": str(e), "raw_output": response.content}

@@ -1,5 +1,5 @@
 from __future__ import annotations
-import json
+
 from app.src.core.config import settings
 from app.src.agents.base import AIBaseAgent
 from app.src.schemas.cv_parser import CVResponse
@@ -11,8 +11,7 @@ class SkillAnalystAgent(AIBaseAgent):
     def analyze(self, cv_data_json: CVResponse) -> SkillAnalysisResponse:
         raw = super().run(
             prompt_template=settings.SKILL_ANALYST_PROMPT,
-            variable_key="cv_data_json",
-            variable_value=json.dumps(cv_data_json.model_dump()),
+            variables={"cv_data_json":cv_data_json}
         )
         try:
             return SkillAnalysisResponse(**raw)
