@@ -14,7 +14,7 @@ from app.src.schemas.skill_analyst import SkillAnalysisResponse
 from app.src.agents.market_intel import MarketIntelligenceAgent
 from app.src.schemas.report import ReportRequest, ReportResponse
 
-router = APIRouter(prefix="/api/agent", tags=["Agent"])
+router = APIRouter(prefix="/agent", tags=["Agent"])
 
 @router.post("/cv-parser", response_model=CVResponse)
 async def cv_parser(file:UploadFile=File(...)):

@@ -94,13 +94,14 @@ class Settings(BaseSettings):
             - Use bullet points and numbered lists where appropriate.
             - Friendly but professional tone (not boring).
             - Always return ONLY valid Markdown text.
+            - Add relevant emoji icons to each section title (e.g., 👤 for Candidate Summary, 🧩 for Skills, 📈 for Market Analysis, ⚖️ for Skill Gap, 🚀 for Upskilling Plan).
 
             Sections to include:
-            1. **Candidate Summary** (name, email, key skills from CV).
-            2. **Skill Analysis** (explicit, implicit, transferable skills).
-            3. **Market Analysis** (in-demand skills & trends for the role).
-            4. **Skill Gap** (compare candidate skills vs market demands).
-            5. **Upskilling Plan** (personalized learning roadmap).
+            1. **👤 Candidate Summary** (name, email, key skills from CV).
+            2. **🧩 Skill Analysis** (explicit, implicit, transferable skills).
+            3. **📈 Market Analysis** (in-demand skills & trends for the role).
+            4. **⚖️ Skill Gap** (compare candidate skills vs market demands).
+            5. **🚀 Upskilling Plan** (personalized learning roadmap).
 
             Inputs:
             - Candidate Info (from CV Parser):
@@ -113,7 +114,7 @@ class Settings(BaseSettings):
             {market_analysis}
 
             Output:
-            A well-formatted Markdown report. No additional explanation, only markdown plaintext.
+            A well-formatted Markdown report with icons in the section titles. No additional explanation, only markdown plaintext.
         """
 
 settings = Settings(_env_file='.env')
