@@ -5,13 +5,14 @@ SPROUT is an AI-powered system designed to streamline the recruitment process by
 The project is built around four main features:  
 
 1. CV Parsing & Normalization  
-2. Specialized Skill Analysis (newly added)  
-3. Market Intelligence  
-4. Recommendation & Report Generation  
+2. Specialized Skill Analysis  
+3. Market Intelligence (newly added)  
+4. Recommendation & Report Generation (to be implemented)  
 
 This repository currently implements:  
-- The **CV Parsing & Normalization Agent** (Point 1)  
-- The **Specialized Skill Analyst Agent** (Point 2)  
+- **CV Parsing & Normalization Agent** (Point 1)  
+- **Specialized Skill Analyst Agent** (Point 2)  
+- **Market Intelligence Agent** (Point 3)  
 
 ---
 
@@ -23,15 +24,6 @@ Its task is to:
 - Process: Extract key information using an AI agent.  
 - Output: Structured JSON that can be consumed by downstream systems.  
 
-### Fields Extracted:
-- Name  
-- Email  
-- Phone  
-- Education (degree, institution, year)  
-- Experience (position, company, years, description)  
-- Skills (list)  
-- Projects (title, description, technologies)  
-
 ---
 
 ## 🚀 Feature: Specialized Skill Analyst
@@ -40,44 +32,59 @@ Its task is to:
 
 - Input: Structured JSON data from the CV Parser Agent.  
 - Process: Analyze explicit skills, infer implicit skills from projects/experience, and identify transferable skills.  
-- Output: Enhanced structured JSON with skill categorization.  
+- Output: Enhanced structured JSON with skill categorization and reasoning.  
 
-### Fields Extracted:
-- explicit_skills → directly listed in the CV  
-- implicit_skills → inferred from experience and projects  
-- transferable_skills → applicable across multiple domains  
-- description → reasoning for implicit and transferable skills  
+---
 
+## 🚀 Feature: Market Intelligence
+The **Market Intelligence Agent** plays the role of a market researcher.  
+Its task is to:  
+
+- Input: The target role (e.g., "Senior AI Engineer").  
+- Process: Use Tavily Search API to query job requirements and industry trends. Summarize in-demand skills and technologies.  
+- Output: JSON object containing role, in-demand skills, and a concise market summary.  
+
+### Example Output
+```json
+{
+  "role": "Senior AI Engineer",
+  "in_demand_skills": ["Python", "PyTorch", "TensorFlow", "MLOps", "AWS"],
+  "summary": "Senior AI Engineers are expected to have strong Python skills, expertise in PyTorch/TensorFlow, experience with cloud platforms, and knowledge of MLOps best practices."
+}
+```
 ---
 
 ## ⚙️ Tech Stack
 - FastAPI → REST API framework  
 - Pydantic → Response schema validation & normalization  
-- LangChain + OpenAI → AI agent for text parsing and skill analysis  
+- LangChain + OpenAI → AI agent for text parsing and reasoning  
+- Tavily API → External search tool for market intelligence  
 - PyPDF2 / python-docx → Text extraction utilities  
 - pytest + httpx → Unit testing framework  
 
 ---
 
 ## 📂 Project Structure (simplified)
-```
+```json
 sprout/
-│── app/
-│   ├── src/
-│   │   ├── agents/
-│   │   │   ├── base.py             # AI Base Agent
-│   │   │   ├── cv_parser.py        # AI CV Parser Agent
-│   │   │   └── skill_analyst.py    # AI Skill Analyst Agent
-│   │   ├── utils/
-│   │   │   └── extractor.py        # Extractor for PDF/DOCX/TXT
-│   │   └── schemas/
-│   │       ├── cv_parser.py        # Pydantic schema for CV response
-│   │       └── skill_analysis.py   # Pydantic schema for Skill Analyst response
-│   ├── main.py                     # FastAPI entry point
-│── tests/
-│   ├── data/                       # Test CVs (pdf, docx, txt)
-│   ├── test_cv_parser.py           # Unit tests for CV parser route
-│   └── test_skill_analyst.py       # Unit tests for skill analyst route
+│── app/  
+│   ├── src/  
+│   │   ├── agents/  
+│   │   │   ├── cv_parser.py        # AI CV Parser Agent  
+│   │   │   ├── skill_analyst.py    # AI Skill Analyst Agent  
+│   │   │   └── market_intel.py     # Market Intelligence Agent  
+│   │   ├── utils/  
+│   │   │   └── extractor.py        # Extractor for PDF/DOCX/TXT  
+│   │   └── schemas/  
+│   │       ├── cv_parser.py        # Schema for CV response  
+│   │       ├── skill_analysis.py   # Schema for Skill Analyst response  
+│   │       └── market_intel.py     # Schema for Market Intelligence response  
+│   ├── main.py                     # FastAPI entry point  
+│── tests/  
+│   ├── data/                       # Test CVs (pdf, docx, txt)  
+│   ├── test_cv_parser.py           # Unit tests for CV parser  
+│   ├── test_skill_analyst.py       # Unit tests for skill analyst  
+│   └── test_market_intel.py        # Unit tests for market intelligence  
 ```
 ---
 
@@ -85,8 +92,9 @@ sprout/
 1. Install dependencies:
    poetry install
 
-2. Set your OpenAI API key:
-   export OPENAI_API_KEY=your_api_key_here
+2. Set your API keys:
+   export OPENAI_API_KEY=your_openai_key
+   export TAVILY_API_KEY=your_tavily_key
 
 3. Start the FastAPI server:
    uvicorn app.main:app --reload
@@ -96,98 +104,37 @@ sprout/
 
 Endpoints available:
 - POST `/api/agent/cv-parser` → upload CV file and get structured JSON  
-- POST `/api/agent/skill-analyst` → analyze structured JSON for skills  
+- POST `/api/agent/skill-analyst` → analyze structured CV JSON for skills  
+- POST `/api/agent/market-intelligent` → query market demands for a given role  
 
 ---
 
-## 📝 Example Response (CV Parser)
-Example response when parsing **John Doe's CV**:
-```json
-{
-  "name": "John Doe",
-  "email": "john.doe@example.com",
-  "phone": "+1 234 567 890",
-  "education": [
-    {
-      "degree": "B.Sc. in Computer Science",
-      "institution": "University of California, Berkeley",
-      "year": "2014 - 2018"
-    }
-  ],
-  "experience": [
-    {
-      "position": "Data Engineer",
-      "company": "TechCorp Inc.",
-      "years": "Jan 2020 - Present",
-      "description": "Designed and optimized ETL pipelines using Airflow and Spark. Built data warehouse solutions on AWS Redshift. Collaborated with data scientists to deliver real-time analytics."
-    },
-    {
-      "position": "Junior Data Engineer",
-      "company": "DataSolutions LLC",
-      "years": "Jul 2018 - Dec 2019",
-      "description": "Assisted in developing Python-based ETL pipelines. Managed SQL databases and wrote complex queries. Supported migration of on-premise systems to cloud-based infrastructure."
-    }
-  ],
-  "skills": [
-    "Python",
-    "SQL",
-    "Apache Spark",
-    "Airflow",
-    "AWS",
-    "Docker",
-    "Kubernetes",
-    "Data Warehousing"
-  ],
-  "projects": [
-    {
-      "title": "Real-Time Analytics Platform",
-      "description": "Developed a real-time data ingestion system using Kafka and Spark Streaming.",
-      "technologies": [
-        "Kafka",
-        "Spark Streaming"
-      ]
-    },
-    {
-      "title": "Data Lakehouse Implementation",
-      "description": "Led the migration of data warehouse to a lakehouse architecture using Delta Lake.",
-      "technologies": [
-        "Delta Lake"
-      ]
-    }
-  ]
-}
-```
+## 📝 How to Get Tavily API Key
+1. Go to https://tavily.com  
+2. Sign up for a free account  
+3. Navigate to **API Keys** in your dashboard  
+4. Copy your key and add it to your environment:
+   export TAVILY_API_KEY=your_tavily_key
+
 ---
 
-## 📝 Example Response (Skill Analyst)
-Example response when analyzing **John Doe's CV structured JSON**:
-```json
-{
-  "explicit_skills": [
-    "Python",
-    "SQL",
-    "Apache Spark",
-    "Airflow",
-    "AWS",
-    "Docker",
-    "Kubernetes",
-    "Data Warehousing"
-  ],
-  "implicit_skills": [
-    "ETL Design",
-    "Cloud Architecture",
-    "Real-time Data Processing",
-    "Data Migration"
-  ],
-  "transferable_skills": [
-    "Problem Solving",
-    "Collaboration",
-    "System Design"
-  ],
-  "description": [
-    "ETL Design inferred from Airflow pipelines.",
-    "Cloud Architecture inferred from AWS migration.",
-    "System Design transferable from building large-scale pipelines."
-  ]
-}
-```
+## 🤔 Why Tavily API?
+- **LangChain Native Integration** → Tavily has first-class support in LangChain, so it’s plug-and-play.  
+- **Relevant Results** → Tavily is optimized for AI agent search, unlike generic search engines.  
+- **AI-Oriented** → Results are structured (title, url, snippet), making them easier for LLMs to consume.  
+- **Fallback Ready** → If quota runs out, it’s easy to replace with DuckDuckGo search as backup.  
+
+This makes Tavily the most practical and professional choice for building the Market Intelligence Agent.  
+
+---
+
+## ✅ Testing
+Unit tests are included for all agents.  
+
+Run tests:
+   pytest -v
+
+Tests cover:
+- CV Parser → parses PDF/DOCX/TXT into JSON  
+- Skill Analyst → analyzes explicit/implicit/transferable skills  
+- Market Intelligence → queries (mocked) Tavily results and validates JSON output  
