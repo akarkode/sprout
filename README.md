@@ -1,140 +1,171 @@
 # 🌱 SPROUT  
 **Smart Processing for Resume, Opportunities, and Unique Talent**
 
-SPROUT is an AI-powered system designed to streamline the recruitment process by transforming unstructured CVs into structured, machine-readable data.  
-The project is built around four main features:  
-
-1. CV Parsing & Normalization  
-2. Specialized Skill Analysis  
-3. Market Intelligence (newly added)  
-4. Recommendation & Report Generation (to be implemented)  
-
-This repository currently implements:  
-- **CV Parsing & Normalization Agent** (Point 1)  
-- **Specialized Skill Analyst Agent** (Point 2)  
-- **Market Intelligence Agent** (Point 3)  
+SPROUT is an **AI-powered multi-agent system** that streamlines the recruitment process by transforming raw CVs into actionable insights.  
+It is designed to augment recruiters with **structured parsing, skill analysis, market intelligence, and personalized reports**.
 
 ---
 
-## 🚀 Feature: CV Parsing & Normalization
-The **CV Parser Agent** plays the role of a data engineer.  
-Its task is to:  
-
-- Input: Ingest a raw CV (PDF, DOCX, or TXT).  
-- Process: Extract key information using an AI agent.  
-- Output: Structured JSON that can be consumed by downstream systems.  
+## 🎥 Demo
+<video src="docs/demo.mp4" controls autoplay muted loop width="700"></video>
 
 ---
 
-## 🚀 Feature: Specialized Skill Analyst
-The **Skill Analyst Agent** plays the role of a subject matter expert.  
-Its task is to:  
+## 🏗️ System Architecture
+![Architecture](docs/architecture.png)
 
-- Input: Structured JSON data from the CV Parser Agent.  
-- Process: Analyze explicit skills, infer implicit skills from projects/experience, and identify transferable skills.  
-- Output: Enhanced structured JSON with skill categorization and reasoning.  
+**Flow:**
+1. **Frontend (HTML/JS)** → Upload CV + target role.  
+2. **FastAPI Backend** → API gateway & routes.  
+3. **Multi-Agent Orchestration (LangGraph)** → coordinates agents:  
+   - CV Parser Agent  
+   - Skill Analyst Agent  
+   - Market Intelligence Agent  
+   - Report Agent  
+4. **Output** → Structured JSON + Markdown report (rendered in UI).  
 
 ---
 
-## 🚀 Feature: Market Intelligence
-The **Market Intelligence Agent** plays the role of a market researcher.  
-Its task is to:  
+## 🔍 Features (Assessment Mapping)
 
-- Input: The target role (e.g., "Senior AI Engineer").  
-- Process: Use Tavily Search API to query job requirements and industry trends. Summarize in-demand skills and technologies.  
-- Output: JSON object containing role, in-demand skills, and a concise market summary.  
+### 1. CV Parsing & Normalization Agent
+- **Role:** The "Data Engineer".  
+- **Task:** Ingest raw CV (PDF, DOCX, TXT) → structured JSON.  
+- **Model:** `gpt-4o-mini` (OpenAI) via LangChain → chosen for **robust extraction & JSON reliability**.  
+- **Frameworks:**  
+  - `LangChain` → Prompt chaining.  
+  - `PyPDF2`, `python-docx` → Text extraction.  
+- **Output:** JSON fields (name, email, phone, education, experience, skills, projects).  
 
-### Example Output
-```json
-{
-  "role": "Senior AI Engineer",
-  "in_demand_skills": ["Python", "PyTorch", "TensorFlow", "MLOps", "AWS"],
-  "summary": "Senior AI Engineers are expected to have strong Python skills, expertise in PyTorch/TensorFlow, experience with cloud platforms, and knowledge of MLOps best practices."
-}
-```
+### 2. Specialized Skill Analyst Agent
+- **Role:** The "Subject Matter Expert".  
+- **Task:** Enrich CV with explicit, implicit, and transferable skills.  
+- **Model:** `gpt-4o-mini` → balances cost, speed, and quality inference.  
+- **Why:** Powerful enough to infer skills from context & projects.  
+- **Output:** JSON with categorized skills and reasoning.  
+
+### 3. Market Intelligence Agent
+- **Role:** The "Market Researcher".  
+- **Task:** Query live market/job data for role demands.  
+- **Tool:** [Tavily API](https://tavily.com) → real-time web search.  
+- **Why:** Free-tier, easy integration, reliable for skill demand queries.  
+- **Output:** JSON with in-demand skills and summarized market trends.  
+
+### 4. Recommendation & Report Agent
+- **Role:** The "Strategist & Communicator".  
+- **Task:** Synthesize outputs from Agents 2 + 3 into a professional Markdown report.  
+- **Model:** `gpt-4o-mini`.  
+- **Why:** Generates clean, structured Markdown consistently.  
+- **Output:** Markdown with:  
+  1. Candidate Summary 👤  
+  2. Skill Analysis 🧩  
+  3. Market Analysis 📈  
+  4. Skill Gap ⚖️  
+  5. Upskilling Plan 🚀  
+
+### 5. Multi-Agent Orchestration
+- **Framework:** `LangGraph` (state machine orchestration).  
+- **Why:** Explicitly models dependencies → ensures agents run in correct order.  
+- **Flow:** Parser → Skill Analyst → Market Intel → Report.  
+- **Output:** End-to-end report pipeline from raw CV to final recommendation.  
+
 ---
 
 ## ⚙️ Tech Stack
-- FastAPI → REST API framework  
-- Pydantic → Response schema validation & normalization  
-- LangChain + OpenAI → AI agent for text parsing and reasoning  
-- Tavily API → External search tool for market intelligence  
-- PyPDF2 / python-docx → Text extraction utilities  
-- pytest + httpx → Unit testing framework  
+- **FastAPI** → REST API framework.  
+- **LangChain + LangGraph** → Agent orchestration & LLM integration.  
+- **OpenAI (gpt-4o-mini)** → Default LLM for CV parsing & report generation.  
+- **Tavily API** → External search tool for job market intelligence.  
+- **Pydantic** → Schema validation.  
+- **pytest + httpx** → Unit & integration testing.  
+- **Frontend** → Minimal HTML/JS with Markdown rendering.  
 
----
-
-## 📂 Project Structure (simplified)
-```json
-sprout/
-│── app/  
-│   ├── src/  
-│   │   ├── agents/  
-│   │   │   ├── cv_parser.py        # AI CV Parser Agent  
-│   │   │   ├── skill_analyst.py    # AI Skill Analyst Agent  
-│   │   │   └── market_intel.py     # Market Intelligence Agent  
-│   │   ├── utils/  
-│   │   │   └── extractor.py        # Extractor for PDF/DOCX/TXT  
-│   │   └── schemas/  
-│   │       ├── cv_parser.py        # Schema for CV response  
-│   │       ├── skill_analysis.py   # Schema for Skill Analyst response  
-│   │       └── market_intel.py     # Schema for Market Intelligence response  
-│   ├── main.py                     # FastAPI entry point  
-│── tests/  
-│   ├── data/                       # Test CVs (pdf, docx, txt)  
-│   ├── test_cv_parser.py           # Unit tests for CV parser  
-│   ├── test_skill_analyst.py       # Unit tests for skill analyst  
-│   └── test_market_intel.py        # Unit tests for market intelligence  
-```
 ---
 
 ## ▶️ Running the Application
-1. Install dependencies:
-   poetry install
 
-2. Set your API keys:
-   export OPENAI_API_KEY=your_openai_key
-   export TAVILY_API_KEY=your_tavily_key
+### 1. Install dependencies
+```bash
+poetry install
+```
 
-3. Start the FastAPI server:
-   uvicorn app.main:app --reload
+### 2. Set environment variables
+```bash
+export OPENAI_API_KEY=your_openai_key
+export TAVILY_API_KEY=your_tavily_key
+```
 
-4. Open Swagger UI for testing:
-   http://127.0.0.1:8000/docs
+### 3. Run FastAPI server
+```bash
+uvicorn app.main:app --reload
+```
 
-Endpoints available:
-- POST `/api/agent/cv-parser` → upload CV file and get structured JSON  
-- POST `/api/agent/skill-analyst` → analyze structured CV JSON for skills  
-- POST `/api/agent/market-intelligent` → query market demands for a given role  
+### 4. Open frontend
+Go to:  
+👉 [http://127.0.0.1:8000](http://127.0.0.1:8000)  
 
----
-
-## 📝 How to Get Tavily API Key
-1. Go to https://tavily.com  
-2. Sign up for a free account  
-3. Navigate to **API Keys** in your dashboard  
-4. Copy your key and add it to your environment:
-   export TAVILY_API_KEY=your_tavily_key
-
----
-
-## 🤔 Why Tavily API?
-- **LangChain Native Integration** → Tavily has first-class support in LangChain, so it’s plug-and-play.  
-- **Relevant Results** → Tavily is optimized for AI agent search, unlike generic search engines.  
-- **AI-Oriented** → Results are structured (title, url, snippet), making them easier for LLMs to consume.  
-- **Fallback Ready** → If quota runs out, it’s easy to replace with DuckDuckGo search as backup.  
-
-This makes Tavily the most practical and professional choice for building the Market Intelligence Agent.  
+- Upload CV (PDF/DOCX/TXT).  
+- Enter **Target Role**.  
+- Click **Analyze** → View structured report in Markdown.  
+- Download report as `.md` or `.pdf`.  
 
 ---
 
-## ✅ Testing
-Unit tests are included for all agents.  
+## 🧪 Testing
+Run all tests with:
 
-Run tests:
-   pytest -v
+```bash
+pytest -v
+```
 
-Tests cover:
-- CV Parser → parses PDF/DOCX/TXT into JSON  
-- Skill Analyst → analyzes explicit/implicit/transferable skills  
-- Market Intelligence → queries (mocked) Tavily results and validates JSON output  
+Covers:  
+- CV Parser Agent (pdf, docx, txt).  
+- Skill Analyst Agent.  
+- Market Intelligence Agent.  
+- Report Agent.  
+- Pipeline orchestration (end-to-end).  
+
+---
+
+## 📝 Example Output (Markdown)
+
+```markdown
+# 📄 Candidate Report
+
+## 👤 Candidate Summary
+- **Name:** John Doe
+- **Email:** john.doe@example.com
+- **Skills:** Python, SQL, Apache Spark, Airflow, AWS
+
+## 🧩 Skill Analysis
+- Explicit: Python, SQL, Spark
+- Implicit: ETL, Cloud Architecture
+- Transferable: Problem-Solving, Collaboration
+
+## 📈 Market Analysis (AI Engineer)
+- In-demand: Python, ML, Deep Learning, MLOps
+- Summary: Market expects strong ML + cloud expertise.
+
+## ⚖️ Skill Gap
+- Missing: TensorFlow, PyTorch, MLOps
+- Strengths: Python, Data Engineering
+
+## 🚀 Upskilling Plan
+1. Learn Deep Learning (TensorFlow, PyTorch).  
+2. Study MLOps (MLflow, Kubeflow).  
+3. Build real-world ML projects.  
+```
+
+---
+
+## ✅ Why This Setup?
+- **OpenAI GPT-4o-mini** → best tradeoff (cost, speed, accuracy).  
+- **LangChain & LangGraph** → clean orchestration of multi-agent workflow.  
+- **Tavily API** → ensures real-world, live skill demand search.  
+- **FastAPI + Pydantic** → robust backend with validated responses.  
+- **Testing** → unit & integration with mocked API calls.  
+- **Frontend** → lightweight, modern, Markdown-friendly UI.  
+
+---
+
+✨ With SPROUT, recruiters can go beyond keyword-matching → they get a **structured skill-gap analysis & personalized roadmap** in just a few clicks.
