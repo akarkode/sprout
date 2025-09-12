@@ -7,7 +7,10 @@ from app.src.agents.cv_parser import AICVParser
 from app.src.utils.extractor import CVExtractor
 from app.src.schemas.cv_parser import CVResponse
 from app.src.agents.skill_analyst import SkillAnalystAgent
+from app.src.schemas.market_intel import MarketIntelRequest
+from app.src.schemas.market_intel import MarketIntelResponse
 from app.src.schemas.skill_analyst import SkillAnalysisResponse
+from app.src.agents.market_intel import MarketIntelligenceAgent
 
 router = APIRouter(prefix="/api/agent", tags=["Agent"])
 
@@ -19,3 +22,7 @@ async def cv_parser(file:UploadFile=File(...)):
 @router.post("/skill-analyst", response_model=SkillAnalysisResponse)
 async def skill_analyst(cv_data_json:CVResponse):
     return SkillAnalystAgent().analyze(cv_data_json=cv_data_json)
+
+@router.post("/market-intelligent", response_model=MarketIntelResponse)
+async def skill_analyst(body: MarketIntelRequest):
+    return MarketIntelligenceAgent().analyze(role=body.role)
