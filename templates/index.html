@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>🌱 SPROUT - AI</title>
+  <script src="https://cdn.jsdelivr.net/npm/markdown-it/dist/markdown-it.min.js"></script>
+  <style>
+    body {
+      font-family: "Inter", sans-serif;
+      background: linear-gradient(135deg, #eef2ff, #e0f2fe);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+    }
+    .card {
+      background: white;
+      padding: 3rem;
+      border-radius: 1.5rem;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+      max-width: 950px;
+      width: 100%;
+      animation: fadeIn 0.6s ease-in-out;
+    }
+    h1 {
+      font-size: 2.2rem;
+      margin-bottom: 2rem;
+      text-align: center;
+    }
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+    label {
+      font-weight: 600;
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+    input[type="text"], input[type="file"] {
+      width: 100%;
+      padding: 0.9rem;
+      font-size: 1rem;
+      border: 1px solid #ddd;
+      border-radius: 0.6rem;
+    }
+    .btn {
+      background: #2563eb;
+      color: white;
+      padding: 0.8rem 2rem;
+      font-size: 1rem;
+      border: none;
+      border-radius: 0.7rem;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    .btn:hover {
+      background: #1d4ed8;
+      transform: translateY(-2px);
+    }
+    #output {
+      margin-top: 2rem;
+      padding: 2rem;
+      border-radius: 0.7rem;
+      background: #f9fafb;
+      text-align: left;
+      max-height: 550px;
+      overflow-y: auto;
+      font-size: 1rem;
+      line-height: 1.6;
+      animation: fadeIn 0.6s ease-in-out;
+    }
+    #output h1, #output h2, #output h3 {
+      margin-top: 1rem;
+      margin-bottom: 0.8rem;
+      font-weight: 700;
+    }
+    #output ul {
+      margin-left: 1.5rem;
+      list-style-type: "✅ ";
+    }
+    #output blockquote {
+      padding: 0.8rem 1rem;
+      margin: 1rem 0;
+      background: #eef2ff;
+      border-left: 4px solid #6366f1;
+      border-radius: 0.5rem;
+    }
+    .download-buttons {
+      margin-top: 1.5rem;
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+    }
+    .loader {
+      border: 6px solid #f3f3f3;
+      border-top: 6px solid #2563eb;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      animation: spin 1s linear infinite;
+      margin: 1.5rem auto;
+      display: none;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    #output h1, #output h2, #output h3 {
+      margin-top: 1rem;
+      margin-bottom: 0.8rem;
+      font-weight: 700;
+    }
+    #output ul {
+      margin-left: 1.5rem;
+      padding-left: 1rem;
+      list-style: disc;
+    }
+    #output strong {
+      color: #1d4ed8;
+    }
+    #output blockquote {
+      padding: 0.8rem 1rem;
+      margin: 1rem 0;
+      background: #eef2ff;
+      border-left: 4px solid #6366f1;
+      border-radius: 0.5rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>🌱 SPROUT</h1>
+    <form id="cvForm">
+      <div class="form-group">
+        <label for="role">Target Role:</label>
+        <input type="text" id="role" name="role" placeholder="e.g., Senior AI Engineer" required>
+      </div>
+      <div class="form-group">
+        <label for="file">Upload CV:</label>
+        <input type="file" id="file" name="file" accept=".pdf,.docx,.txt" required>
+      </div>
+      <button class="btn" type="submit">Analyze</button>
+    </form>
+
+    <div class="loader" id="loader"></div>
+    <div id="output"></div>
+    <div class="download-buttons" style="display:none;">
+      <button id="downloadMd" class="btn">⬇️ Download .md</button>
+      <button id="downloadPdf" class="btn">⬇️ Download PDF</button>
+    </div>
+  </div>
+
+  <script>
+    const form = document.getElementById("cvForm");
+    const outputDiv = document.getElementById("output");
+    const loader = document.getElementById("loader");
+    const downloadButtons = document.querySelector(".download-buttons");
+    let markdownContent = "";
+    const md = window.markdownit();
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const role = document.getElementById("role").value;
+      const file = document.getElementById("file").files[0];
+      if (!file) return alert("Please upload a CV file!");
+
+      loader.style.display = "block";
+      outputDiv.innerHTML = "";
+      downloadButtons.style.display = "none";
+
+      const formData = new FormData();
+      formData.append("file", file);
+
+      try {
+        const response = await fetch(`/api/orchestration/pipeline?role=${encodeURIComponent(role)}`, {
+          method: "POST",
+          body: formData,
+        });
+
+        if (response.ok) {
+        const data = await response.json();
+        markdownContent = data.markdown_report;
+
+        // 🔥 Clean the markdown string from ```markdown fences
+        const cleanMarkdown = markdownContent
+            .replace(/^```markdown\n/, "")
+            .replace(/```$/, "");
+
+        // Render markdown using markdown-it
+        outputDiv.innerHTML = md.render(cleanMarkdown);
+
+        downloadButtons.style.display = "flex";
+        } else {
+        outputDiv.innerHTML = "<p style='color:red;'>❌ Error analyzing CV.</p>";
+        }
+
+      } catch (error) {
+        outputDiv.innerHTML = "<p style='color:red;'>⚠️ Something went wrong.</p>";
+      } finally {
+        loader.style.display = "none";
+      }
+    });
+
+    document.getElementById("downloadMd").addEventListener("click", () => {
+      const blob = new Blob([markdownContent], { type: "text/markdown" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "cv_report.md";
+      a.click();
+      URL.revokeObjectURL(url);
+    });
+
+    document.getElementById("downloadPdf").addEventListener("click", () => {
+      const printWindow = window.open("", "_blank");
+      printWindow.document.write("<html><head><title>CV Report</title></head><body>");
+      printWindow.document.write(md.render(markdownContent));
+      printWindow.document.write("</body></html>");
+      printWindow.document.close();
+      printWindow.print();
+    });
+  </script>
+</body>
+</html>
