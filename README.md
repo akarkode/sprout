@@ -7,7 +7,7 @@ It is designed to augment recruiters with **structured parsing, skill analysis, 
 ---
 
 ## 🎥 Demo
-<video src="docs/demo.mp4" controls autoplay muted loop width="700"></video>
+[▶️ Play Demo Video](docs/demo.mp4)
 
 ---
 
