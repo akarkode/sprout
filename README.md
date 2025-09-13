@@ -112,6 +112,39 @@ Go to:
 
 ---
 
+## 🐳 Running with Docker
+
+You can also run SPROUT inside a Docker container.
+
+### 1. Build the image
+```docker build -t sprout .```
+
+### 2. Run the container
+Using environment variables:
+```bash
+docker run -it --rm -p 8000:8000 \
+  -e OPENAI_API_KEY=your_openai_key \
+  -e TAVILY_API_KEY=your_tavily_key \
+  sprout
+```
+
+Or using an `.env` file:
+1. Create a file named `.env`:
+  ```bash
+  OPENAI_API_KEY=your_openai_key
+  TAVILY_API_KEY=your_tavily_key
+  ```
+
+2. Run with:
+  ```docker run -it --rm -p 8000:8000 --env-file .env sprout```
+
+### 3. Access the app
+Go to:
+👉 [http://127.0.0.1:8000](http://127.0.0.1:8000)
+
+Here you can upload a CV file and test the full multi-agent pipeline.
+
+
 ## 🧪 Testing
 Run all tests with:
 
