@@ -12,8 +12,8 @@ It is designed to augment recruiters with **structured parsing, skill analysis, 
 ---
 
 ## 🏗️ System Architecture
-![Dark](docs/architecture.png)#gh-dark-mode-only)
-![Light](docs/architecture_for_light_mode.png)#gh-light-mode-only)
+![Dark](docs/architecture.png)gh-dark-mode-only)
+![Light](docs/architecture_for_light_mode.png#gh-light-mode-only)
 
 **Flow:**
 1. **Frontend (HTML/JS)** → Upload CV + target role.  
